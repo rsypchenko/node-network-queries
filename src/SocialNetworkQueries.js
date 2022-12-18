@@ -1,6 +1,5 @@
 export class SocialNetworkQueries {
   constructor({ fetchCurrentUser }) {
-    this.user = null;
     this.fetchCurrentUser = fetchCurrentUser;
   }
 
@@ -9,6 +8,8 @@ export class SocialNetworkQueries {
     const map = {};
     const { likes = [], friends = [] } = user;
     const excluded = likes.books ?? [];
+
+    if (friends.length === 0) return books;
 
     for (let i = 0; i < friends.length; i++) {
       let books = friends[i]?.likes?.books?.filter(name => !excluded.includes(name));
@@ -33,9 +34,7 @@ export class SocialNetworkQueries {
 
     for (let key of keys) {
       let num = map[key] / friends.length;
-      if (num >= minimalScore) {
-        books.push(key);
-      }
+      if (num >= minimalScore) books.push(key);
     }
 
     return books;
@@ -48,9 +47,7 @@ export class SocialNetworkQueries {
           const books = this.getListOfLikedBooks(user, minimalScore);
           resolve({ books });
         })
-        .catch(() => {
-          resolve({ books: [] });
-        });
+        .catch(() => resolve({ books: [] }));
     });
   }
 }
